@@ -56,11 +56,10 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
 
 # Define the class that will respond to the URL
-class ListMessagesHandler(tornado.web.RequestHandler):
+class UserHandler(tornado.web.RequestHandler):
     def get(self):
         users = ['Matt', 'Patt', 'Pupo']
-        self.render("templates/index.html",
-                    users=users)
+        self.render("templates/index.html")
 
 class LoginHandler(tornado.web.RequestHandler):
 
@@ -88,7 +87,7 @@ class LoginHandler(tornado.web.RequestHandler):
     #             return HttpResponseRedirect('/ttt/invalid/')
 
 application = tornado.web.Application([
-    (r"/", ListMessagesHandler),
+    (r"/", UserHandler),
     (r"/login", LoginHandler),
     (r'/ws', WSHandler),
 ])

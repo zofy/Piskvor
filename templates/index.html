@@ -2,11 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <link rel='stylesheet' type='text/css'
+          href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css'>
     <title>Welcome</title>
 </head>
 <body>
-    {% for user in users %}
-        <p>{{ user }}</p>
-    {% end %}
+<form action="/" method="POST" class="ui form">
+  <div class="field">
+    <input type="text" placeholder="enter your nick...">
+  </div>
+</form>
 </body>
 </html>
