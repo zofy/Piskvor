@@ -33,18 +33,18 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     clients = []
 
     def open(self):
-        print 'new connection'
+        print('new connection')
         WSHandler.clients.append(self)
 
     def on_message(self, message):
-        print 'message received:  %s' % message
+        print('message received:  %s' % message)
         # self.check_message(message)
         # Reverse Message and send it back
         # print 'sending back message: %s' % message[::-1]
         # self.write_message(message[::-1])
 
     def on_close(self):
-        print 'connection closed'
+        print('connection closed')
         # self.user_logout()
         WSHandler.clients.remove(self)
 
@@ -98,6 +98,6 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
     http_server.listen(os.environ.get("PORT", 8000))
     myIP = socket.gethostbyname(socket.gethostname())
-    print '*** TornadoApp started at %s***' % myIP
+    print('*** TornadoApp started at %s***' % myIP)
     tornado.ioloop.PeriodicCallback(try_exit, 100).start()
     tornado.ioloop.IOLoop.instance().start()
