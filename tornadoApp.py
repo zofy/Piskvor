@@ -1,3 +1,4 @@
+# import config
 import logging
 import socket
 import os
@@ -12,8 +13,11 @@ from tornado.httpclient import AsyncHTTPClient
 
 from tornado.options import options
 
+from WSHandler import WSHandler
 
 is_closing = False
+
+BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Piskvor')
 
 
 def signal_handler(signum, frame):
@@ -29,40 +33,40 @@ def try_exit():
         logging.info('exit success')
 
 
-class WSHandler(tornado.websocket.WebSocketHandler):
-    clients = []
-
-    def open(self):
-        print('new connection')
-        WSHandler.clients.append(self)
-
-    def on_message(self, message):
-        print('message received:  %s' % message)
-        # self.check_message(message)
-        # Reverse Message and send it back
-        # print 'sending back message: %s' % message[::-1]
-        # self.write_message(message[::-1])
-
-    def on_close(self):
-        print('connection closed')
-        # self.user_logout()
-        WSHandler.clients.remove(self)
-
-    def check_origin(self, origin):
-        host = self.request.headers.get('Host')
-        print(host)
-        print(origin)
-        return True
+# class WSHandler(tornado.websocket.WebSocketHandler):
+#     clients = []
+#
+#     def open(self):
+#         print('new connection')
+#         WSHandler.clients.append(self)
+#
+#     def on_message(self, message):
+#         print('message received:  %s' % message)
+#         # self.check_message(message)
+#         # Reverse Message and send it back
+#         # print 'sending back message: %s' % message[::-1]
+#         # self.write_message(message[::-1])
+#
+#     def on_close(self):
+#         print('connection closed')
+#         # self.user_logout()
+#         WSHandler.clients.remove(self)
+#
+#     def check_origin(self, origin):
+#         host = self.request.headers.get('Host')
+#         print(host)
+#         print(origin)
+#         return True
 
 
 # Define the class that will respond to the URL
 class UserHandler(tornado.web.RequestHandler):
     def get(self):
         users = ['Matt', 'Patt', 'Pupo']
-        self.render("templates/index.html")
+        self.render("index.html")
+
 
 class LoginHandler(tornado.web.RequestHandler):
-
     @gen.coroutine
     def get(self):
         http_client = AsyncHTTPClient()
@@ -72,28 +76,38 @@ class LoginHandler(tornado.web.RequestHandler):
         # form = LoginForm()
         # self.render('templates/toro/login.html', form=form, button_name='Login', url='ttt:login')
 
-    # def post(self):
-    #     if request.method == 'POST':
-    #         form = LoginForm(request.POST)
-    #         user = None
-    #         if form.is_valid():
-    #             user = form.authenticate()
-    #
-    #         if user is not None:
-    #             request.session['user'] = user.name
-    #             request.session.set_expiry(0)
-    #             return self.redirect('/ttt/menu/')
-    #         else:
-    #             return HttpResponseRedirect('/ttt/invalid/')
+        # def post(self):
+        #     if request.method == 'POST':
+        #         form = LoginForm(request.POST)
+        #         user = None
+        #         if form.is_valid():
+        #             user = form.authenticate()
+        #
+        #         if user is not None:
+        #             request.session['user'] = user.name
+        #             request.session.set_expiry(0)
+        #             return self.redirect('/ttt/menu/')
+        #         else:
+        #             return HttpResponseRedirect('/ttt/invalid/')
 
-application = tornado.web.Application([
-    (r"/", UserHandler),
-    (r"/login", LoginHandler),
-    (r'/ws', WSHandler),
-])
+
+class Application(tornado.web.Application):
+    def __init__(self):
+        handlers = [
+            (r"/", UserHandler),
+            (r"/login", LoginHandler),
+            (r'/ws', WSHandler),
+        ]
+        settings = {
+            "debug": True,
+            "template_path": os.path.join(BASE_DIR, "templates"),
+            "static_path": os.path.join(BASE_DIR, "static")
+        }
+        tornado.web.Application.__init__(self, handlers, **settings)
+
 
 if __name__ == "__main__":
-    http_server = tornado.httpserver.HTTPServer(application)
+    http_server = tornado.httpserver.HTTPServer(Application())
     tornado.options.parse_command_line()
     signal.signal(signal.SIGINT, signal_handler)
     http_server.listen(os.environ.get("PORT", 8000))
