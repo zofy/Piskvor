@@ -2,20 +2,22 @@ import tornado
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 
+from WSHandler import WSHandler
+
 
 class UserHandler(tornado.web.RequestHandler):
     def get(self):
-        users = ['Matt', 'Patt', 'Pupo']
         self.render("index.html")
 
     def post(self):
-        print(self.get_argument('nick'))
+        print('New player: ' + self.get_argument('nick'))
+        WSHandler.users.append(self.get_argument('nick'))
         self.redirect('/game')
 
 
 class GameHandler(tornado.web.RequestHandler):
     def get(self):
-        self.render("game.html")
+        self.render("game.html", users=WSHandler.users)
 
 
 class LoginHandler(tornado.web.RequestHandler):

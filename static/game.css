@@ -1,0 +1,23 @@
+body {
+    background: #232323;
+    color: white;
+}
+
+.square {
+    background: hotpink;
+    float: left;
+    /*These values are set up in accordance to the size of board*/
+    margin: 1.25%;
+    width: 30%;
+    padding-bottom: 30%;
+    border-radius: 15%;
+    transition: background .4s;
+}
+
+.side {
+    margin: 35% 35% auto;
+}
+
+.color {
+    margin: 70% 40% auto;
+}

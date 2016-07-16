@@ -32,6 +32,7 @@ def try_exit():
 
 
 class Application(tornado.web.Application):
+
     def __init__(self):
         handlers = [
             (r"/", UserHandler),

@@ -2,7 +2,7 @@ import tornado
 
 
 class WSHandler(tornado.websocket.WebSocketHandler):
-    clients = []
+    users = []
 
     def open(self):
         print('new connection')

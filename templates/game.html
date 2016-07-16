@@ -2,9 +2,30 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.2/semantic.min.js"></script>
+    <link rel="stylesheet" href="{{ static_url('game.css') }}">
     <title>TicTacToe</title>
 </head>
 <body>
 <h1>We are here</h1>
+{% for u in users %}
+    <p>User: {{ u }}</p>
+{% end %}
+    <div class="ui three column grid">
+        <div class="column">
+            <div class="square side"></div>
+            <h2 class="color">His Color</h2>
+        </div>
+        <div class="column">
+            {% for x in range(9) %}
+                <div class="square"></div>
+            {% end %}
+        </div>
+        <div class="column">
+            <div class="square side"></div>
+            <h2 class="color">My Color</h2>
+        </div>
+    </div>
 </body>
 </html>
