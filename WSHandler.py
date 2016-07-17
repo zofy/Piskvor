@@ -1,4 +1,8 @@
+import json
+
 import tornado
+
+import views
 
 
 class WSHandler(tornado.websocket.WebSocketHandler):
@@ -6,7 +10,8 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         print('new connection')
-        WSHandler.clients.append(self)
+        WSHandler.users.append(self)
+        self.write_message('I got you!')
 
     def on_message(self, message):
         print('message received:  %s' % message)
@@ -18,7 +23,7 @@ class WSHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         print('connection closed')
         # self.user_logout()
-        WSHandler.clients.remove(self)
+        # WSHandler.users.remove(self)
 
     def check_origin(self, origin):
         host = self.request.headers.get('Host')

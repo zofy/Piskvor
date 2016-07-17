@@ -11,7 +11,7 @@ import tornado.web
 from tornado.options import options
 
 from WSHandler import WSHandler
-from views import LoginHandler, GameHandler
+from views import LoginHandler, GameHandler, LogoutHandler
 
 is_closing = False
 
@@ -37,6 +37,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", GameHandler),
             (r"/login", LoginHandler),
+            (r"/logout", LogoutHandler),
             (r'/ws', WSHandler),
         ]
         settings = {

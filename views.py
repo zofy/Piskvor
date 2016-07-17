@@ -2,7 +2,7 @@ import tornado
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 
-from WSHandler import WSHandler
+import WSHandler
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -13,7 +13,7 @@ class BaseHandler(tornado.web.RequestHandler):
 class GameHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        self.render("game.html", users=WSHandler.users)
+        self.render("game.html", users=WSHandler.WSHandler.users)
 
 
 class LoginHandler(BaseHandler):
@@ -24,3 +24,9 @@ class LoginHandler(BaseHandler):
     def post(self):
         self.set_secure_cookie("user", self.get_argument("nick"))
         self.redirect('/')
+
+
+class LogoutHandler(BaseHandler):
+    def get(self):
+        self.clear_cookie("user")
+        self.redirect("/")
