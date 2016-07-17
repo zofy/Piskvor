@@ -10,7 +10,8 @@
 </head>
 <body>
 <div class="container">
-    <form action="/" method="POST" class="ui form">
+    <form action="/login" method="POST" class="ui form">
+        {% module xsrf_form_html() %}
         <div class="field">
             <input id="nick" name="nick" type="text" placeholder="enter your nick...">
         </div>

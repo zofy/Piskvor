@@ -11,7 +11,7 @@ import tornado.web
 from tornado.options import options
 
 from WSHandler import WSHandler
-from views import UserHandler, LoginHandler, GameHandler
+from views import LoginHandler, GameHandler
 
 is_closing = False
 
@@ -35,12 +35,14 @@ class Application(tornado.web.Application):
 
     def __init__(self):
         handlers = [
-            (r"/", UserHandler),
-            (r"/game", GameHandler),
+            (r"/", GameHandler),
             (r"/login", LoginHandler),
             (r'/ws', WSHandler),
         ]
         settings = {
+            "cookie_secret": "__BIG_CITY_LIFE__",
+            "login_url": "/login",
+            "xsrf_cookies": True,
             "debug": True,
             "template_path": os.path.join(BASE_DIR, "templates"),
             "static_path": os.path.join(BASE_DIR, "static")
