@@ -10,7 +10,7 @@ webSockets.getNick = function(){
         type: 'GET',
         url: '/getNick',
         success: function(json){
-            alert("Your name is: " + json['nick']);
+//            alert("Your name is: " + json['nick']);
             webSockets.ws.send('{"nick": ' + '"' + json['nick'] + '"' + '}')
         },
         dataType: 'json'

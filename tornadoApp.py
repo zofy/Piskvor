@@ -3,6 +3,8 @@ import socket
 import os
 
 import signal
+from datetime import datetime
+
 import tornado.httpserver
 import tornado.websocket
 import tornado.ioloop
@@ -10,7 +12,7 @@ import tornado.web
 
 from tornado.options import options
 
-from WSHandler import WSHandler
+from WSHandler import WSHandler, check_pending
 from views import LoginHandler, GameHandler, LogoutHandler, UserHandler
 
 is_closing = False

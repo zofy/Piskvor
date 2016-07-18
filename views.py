@@ -21,6 +21,7 @@ class UserHandler(BaseHandler):
 class GameHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
+        print(tornado.escape.xhtml_escape(self.current_user) in WSHandler.users)
         if tornado.escape.xhtml_escape(self.current_user) in WSHandler.users:
             self.clear_cookie("user")
             self.redirect("/")
