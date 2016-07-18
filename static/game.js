@@ -11,7 +11,8 @@ webSockets.getNick = function(){
         url: '/getNick',
         success: function(json){
 //            alert("Your name is: " + json['nick']);
-            webSockets.ws.send('{"nick": ' + '"' + json['nick'] + '"' + '}')
+            alert("Your ts is: " + json['ts']);
+            webSockets.ws.send('{"nick": ' + '"' + json['nick'] + '", ' + '"' + "ts" + '":' + ' "' + json['ts'] + '"' + '}')
         },
         dataType: 'json'
     });

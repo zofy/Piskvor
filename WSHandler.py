@@ -32,5 +32,5 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def check_message(self, message):
         if 'nick' in message:
-            WSHandler.users[message['nick']] = self
+            WSHandler.users[message['nick']] = (self, str(message['ts']))
             WSHandler.users[self] = message['nick']

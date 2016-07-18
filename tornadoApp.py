@@ -12,7 +12,7 @@ import tornado.web
 
 from tornado.options import options
 
-from WSHandler import WSHandler, check_pending
+from WSHandler import WSHandler
 from views import LoginHandler, GameHandler, LogoutHandler, UserHandler
 
 is_closing = False
