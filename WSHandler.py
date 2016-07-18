@@ -2,31 +2,31 @@ import json
 
 import tornado
 
-import views
-
 
 class WSHandler(tornado.websocket.WebSocketHandler):
-    users = []
+    users = dict()
+    clients = set()
 
     def open(self):
         print('new connection')
-        WSHandler.users.append(self)
+        WSHandler.clients.add(self)
         self.write_message('I got you!')
 
     def on_message(self, message):
         print('message received:  %s' % message)
-        # self.check_message(message)
+        self.check_message(json.loads(message))
         # Reverse Message and send it back
-        # print 'sending back message: %s' % message[::-1]
-        # self.write_message(message[::-1])
 
     def on_close(self):
         print('connection closed')
-        # self.user_logout()
-        # WSHandler.users.remove(self)
+        WSHandler.clients.remove(self)
 
     def check_origin(self, origin):
         host = self.request.headers.get('Host')
         print(host)
         print(origin)
         return True
+
+    def check_message(self, message):
+        if 'nick' in message:
+            WSHandler.users[message['nick']] = self

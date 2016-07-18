@@ -5,6 +5,22 @@ var webSockets = {};
 
 webSockets.ws = new WebSocket('ws://localhost:8000/ws');
 
+webSockets.getNick = function(){
+    $.ajax({
+        type: 'GET',
+        url: '/getNick',
+        success: function(json){
+            alert("Your name is: " + json['nick']);
+            webSockets.ws.send('{"nick": ' + '"' + json['nick'] + '"' + '}')
+        },
+        dataType: 'json'
+    });
+}
+
+webSockets.ws.onopen = function(){
+    webSockets.getNick();
+}
+
 webSockets.ws.onmessage = function(msg){
     console.log("Message: " + msg.data);
 }

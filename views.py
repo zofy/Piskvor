@@ -1,8 +1,10 @@
+import json
+
 import tornado
 from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 
-import WSHandler
+from WSHandler import WSHandler
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -10,10 +12,20 @@ class BaseHandler(tornado.web.RequestHandler):
         return self.get_secure_cookie("user")
 
 
+class UserHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
+        self.write(json.dumps({'nick': tornado.escape.xhtml_escape(self.current_user)}))
+
+
 class GameHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        self.render("game.html", users=WSHandler.WSHandler.users)
+        if tornado.escape.xhtml_escape(self.current_user) in WSHandler.users:
+            self.clear_cookie("user")
+            self.redirect("/")
+        else:
+            self.render("game.html")
 
 
 class LoginHandler(BaseHandler):
