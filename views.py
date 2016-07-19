@@ -12,9 +12,6 @@ class BaseHandler(tornado.web.RequestHandler):
     def get_current_user(self):
         return self.get_secure_cookie("user")
 
-    def get_current_timestamp(self):
-        return self.get_secure_cookie("timestamp")
-
 
 class UserHandler(BaseHandler):
     @tornado.web.authenticated
@@ -26,12 +23,9 @@ class UserHandler(BaseHandler):
 class GameHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        print(tornado.escape.xhtml_escape(self.current_user) in WSHandler.users)
-        print(type(tornado.escape.xhtml_escape(self.get_secure_cookie("timestamp"))))
-        if tornado.escape.xhtml_escape(self.current_user) in WSHandler.users and WSHandler.users[
-            tornado.escape.xhtml_escape(self.current_user)][1] != tornado.escape.xhtml_escape(
-                self.get_secure_cookie("timestamp")):
-            print(type(WSHandler.users[tornado.escape.xhtml_escape(self.current_user)]))
+        name, timestamp = tornado.escape.xhtml_escape(self.current_user), tornado.escape.xhtml_escape(
+            self.get_secure_cookie("timestamp"))
+        if name in WSHandler.users and WSHandler.users[WSHandler.users[name]][1] != timestamp:
             self.clear_cookie("user")
             self.redirect("/")
         else:
@@ -46,6 +40,7 @@ class LoginHandler(BaseHandler):
     def post(self):
         self.set_secure_cookie("user", self.get_argument("nick"))
         self.set_secure_cookie("timestamp", str(time.time()))
+        print("Your ts is: " + str(self.get_secure_cookie("timestamp")))
         self.redirect('/')
 
 

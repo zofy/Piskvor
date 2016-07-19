@@ -1,12 +1,36 @@
 import json
-import datetime
-
 import tornado
+
+
+class UserManager(object):
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(UserManager, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
+    def logout(self, conn):
+        try:
+            del WSHandler.users[WSHandler.users[conn][0]]
+        except:
+            pass
+
+    def check_message(self, conn, message):
+        try:
+            message = json.loads(message)
+        except:
+            pass
+        finally:
+            if 'nick' in message and 'ts' in message:
+                WSHandler.users[message['nick']] = conn
+                WSHandler.users[conn] = (message['nick'], message['ts'])
 
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     users = dict()
     clients = set()
+    manager = UserManager()
 
     def open(self):
         print('new connection')
@@ -15,22 +39,16 @@ class WSHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         print('message received:  %s' % message)
-        self.check_message(json.loads(message))
+        WSHandler.manager.check_message(self, message)
         # Reverse Message and send it back
 
     def on_close(self):
         print('connection closed')
         WSHandler.clients.remove(self)
-        del WSHandler.users[WSHandler.users[self]]
-        print(WSHandler.users[self] in WSHandler.users)
+        WSHandler.manager.logout(self)
 
     def check_origin(self, origin):
         # host = self.request.headers.get('Host')
         # print(host)
         # print(origin)
         return True
-
-    def check_message(self, message):
-        if 'nick' in message:
-            WSHandler.users[message['nick']] = (self, str(message['ts']))
-            WSHandler.users[self] = message['nick']
