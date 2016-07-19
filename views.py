@@ -23,9 +23,15 @@ class UserHandler(BaseHandler):
 class GameHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
+        self.render("game.html")
+
+
+class MenuHandler(BaseHandler):
+    @tornado.web.authenticated
+    def get(self):
         name, timestamp = tornado.escape.xhtml_escape(self.current_user), tornado.escape.xhtml_escape(
             self.get_secure_cookie("timestamp"))
-        if name in WSHandler.users and WSHandler.users[WSHandler.users[name]][1] != timestamp:
+        if name in WSHandler.users and WSHandler.conns[WSHandler.users[name]][1] != timestamp:
             self.clear_cookie("user")
             self.redirect("/")
         else:

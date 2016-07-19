@@ -12,7 +12,8 @@ class UserManager(object):
 
     def logout(self, conn):
         try:
-            del WSHandler.users[WSHandler.users[conn][0]]
+            del WSHandler.users[WSHandler.conns[conn][0]]
+            del WSHandler.conns[conn]
         except:
             pass
 
@@ -24,11 +25,12 @@ class UserManager(object):
         finally:
             if 'nick' in message and 'ts' in message:
                 WSHandler.users[message['nick']] = conn
-                WSHandler.users[conn] = (message['nick'], message['ts'])
+                WSHandler.conns[conn] = (message['nick'], message['ts'])
 
 
 class WSHandler(tornado.websocket.WebSocketHandler):
     users = dict()
+    conns = dict()
     clients = set()
     manager = UserManager()
 

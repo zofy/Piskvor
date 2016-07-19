@@ -2,9 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <link rel='stylesheet' type='text/css'
+          href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css'>
     <title>TicTacToe</title>
 </head>
 <body>
+<div id="container">
+    <h1>Choose your superior <i class="fa fa-search"></i></h1>
+    {% module xsrf_form_html() %}
+    <input id='search' type="text" placeholder="find your partner">
+    <div>
+        <ul id="search_results">
 
+        </ul>
+    </div>
+    <button>Play with Computer</button>
+</div>
+<script src="{{ static_url('menu.js') }}"></script>
 </body>
 </html>

@@ -3,7 +3,6 @@ import socket
 import os
 
 import signal
-from datetime import datetime
 
 import tornado.httpserver
 import tornado.websocket
@@ -13,7 +12,7 @@ import tornado.web
 from tornado.options import options
 
 from WSHandler import WSHandler
-from views import LoginHandler, GameHandler, LogoutHandler, UserHandler
+from views import LoginHandler, GameHandler, LogoutHandler, UserHandler, MenuHandler
 
 is_closing = False
 
@@ -37,7 +36,7 @@ class Application(tornado.web.Application):
 
     def __init__(self):
         handlers = [
-            (r"/", GameHandler),
+            (r"/", MenuHandler),
             (r"/getNick", UserHandler),
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),
