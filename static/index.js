@@ -31,7 +31,15 @@ ajax.refreshUsers = function(){
 }
 
 webSockets.handleMessage = function(msg){
-    if('refresh' === msg) ajax.refreshUsers();
+    try{
+        var json = JSON.parse(msg);
+    }catch(e){
+        console.log(msg);
+    }finally{
+        if('refresh' in json) {ajax.refreshUsers();}
+        else if ('proposal' in json) {alert(json['proposal'] + ' wants to play!');}
+        else if ('answer' in json) {alert(json['answer'] + ' does not want to play with you!')}
+    }
 }
 
 webSockets.ws.onopen = function(){
@@ -51,10 +59,10 @@ webSockets.ws.onclose = function(){
 
 
 index.refreshUsers = function(json){
-    var oldHtml = $('#users').html();
+    var newHtml = '';
     console.log(json.users);
     json.users.forEach(function(user){
-        oldHtml += "<p>" + user + "</p>";
+        newHtml += "<p>" + user + "</p>";
     });
-    $('#users').html(oldHtml);
+    $('#users').html(newHtml);
 }
