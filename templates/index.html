@@ -5,18 +5,24 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <link rel='stylesheet' type='text/css'
           href='https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css'>
-    <link rel="stylesheet" href="{{ static_url('index.css') }}">
-    <title>Welcome</title>
+    <title>TicTacToe</title>
 </head>
 <body>
-<div class="container">
-    <form action="/login" method="POST" class="ui form">
-        {% module xsrf_form_html() %}
-        <div class="field">
-            <input id="nick" name="nick" type="text" placeholder="enter your nick...">
-        </div>
-    </form>
+<div id="users">
+
 </div>
-<script type="text/javascript" src="{{ static_url('index.js') }}"></script>
+
+<div id="container">
+    <h1>Choose your superior <i class="fa fa-search"></i></h1>
+    {% module xsrf_form_html() %}
+    <input id='search' type="text" placeholder="find your partner">
+    <div>
+        <ul id="search_results">
+
+        </ul>
+    </div>
+    <button>Play with Computer</button>
+</div>
+<script src="{{ static_url('index.js') }}"></script>
 </body>
 </html>
