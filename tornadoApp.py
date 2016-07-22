@@ -12,6 +12,7 @@ import tornado.web
 from tornado.options import options
 
 from IndexWSHandler import IndexWSHandler
+from PvpWSHandler import PvpWSHandler
 from views import LoginHandler, GameHandler, LogoutHandler, UserHandler, IndexHandler, BaseHandler
 
 is_closing = False
@@ -41,7 +42,9 @@ class Application(tornado.web.Application):
             (r"/liveUsers", UserHandler),
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),
-            (r'/ws', IndexWSHandler),
+            (r"/game", GameHandler),
+            (r'/ws_index', IndexWSHandler),
+            (r'/ws_game', PvpWSHandler),
         ]
         settings = {
             "cookie_secret": "__BIG_CITY_LIFE__",

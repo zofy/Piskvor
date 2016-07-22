@@ -6,6 +6,7 @@ from tornado import gen
 from tornado.httpclient import AsyncHTTPClient
 
 from IndexWSHandler import IndexWSHandler
+from PvpWSHandler import PvpWSHandler
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -28,7 +29,8 @@ class UserHandler(BaseHandler):
 class GameHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
-        self.render("game.html")
+        self.render("game.html") if tornado.escape.xhtml_escape(
+            self.current_user) in PvpWSHandler.players else self.redirect("/")
 
 
 class IndexHandler(BaseHandler):
@@ -47,6 +49,7 @@ class LoginHandler(BaseHandler):
     def get(self):
         self.clear_cookie("user")
         self.clear_cookie("timestamp")
+        self.clear_all_cookies()
         self.render("login.html")
 
     def post(self):
@@ -59,4 +62,5 @@ class LogoutHandler(BaseHandler):
     def get(self):
         self.clear_cookie("user")
         self.clear_cookie("timestamp")
+        self.clear_all_cookies()
         self.redirect("/")

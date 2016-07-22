@@ -6,7 +6,7 @@ var index = {};
 var ajax = {};
 var webSockets = {};
 
-webSockets.ws = new WebSocket('ws://localhost:8000/ws');
+webSockets.ws = new WebSocket('ws://localhost:8000/ws_index');
 
 ajax.getNick = function(){
     $.ajax({
@@ -39,6 +39,7 @@ webSockets.handleMessage = function(msg){
         if('refresh' in json) {ajax.refreshUsers();}
         else if ('proposal' in json) {alert(json['proposal'] + ' wants to play!');}
         else if ('answer' in json) {alert(json['answer'] + ' does not want to play with you!')}
+        else if ('play' in json) {alert('We`re gonna play!')}
     }
 }
 

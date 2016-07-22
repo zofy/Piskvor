@@ -1,6 +1,8 @@
 import json
 import tornado
 
+from PvpWSHandler import PvpWSHandler
+
 
 class UserManager(object):
     _instance = None
@@ -28,14 +30,18 @@ class UserManager(object):
             self.handle_answer(conn, json['opponent'], json['answer'])
 
     def send_proposal(self, conn, user):
-        IndexWSHandler.users[user].write_message(
-            json.dumps({'proposal': IndexWSHandler.conns[conn][0]}))
+        if user in IndexWSHandler.users:
+            IndexWSHandler.users[user].write_message(
+                json.dumps({'proposal': IndexWSHandler.conns[conn][0]}))
 
     def handle_answer(self, conn, user, answer):
-        if answer > 0:
-            pass
-        IndexWSHandler.users[user].write_message(
-            json.dumps({'answer': IndexWSHandler.conns[conn][0]}))
+        if user in IndexWSHandler.users:
+            if answer > 0:
+                PvpWSHandler.players[user] = IndexWSHandler.conns[conn][0]
+                PvpWSHandler.players[IndexWSHandler.conns[conn][0]] = user
+                conn.write_message(json.dumps({'play': 'let`s play'}))
+            IndexWSHandler.users[user].write_message(
+                json.dumps({'answer': IndexWSHandler.conns[conn][0]}))
 
     def send_refresh(self):
         print('Sending refresh...')
@@ -53,12 +59,11 @@ class UserManager(object):
 
 class IndexWSHandler(tornado.websocket.WebSocketHandler):
     users = dict()
-    clients = set()
+    conns = dict()
     manager = UserManager()
 
     def open(self):
         print('new connection')
-        # IndexWSHandler.clients.add(self)
 
     def on_message(self, message):
         print('message received:  %s' % message)
@@ -66,7 +71,6 @@ class IndexWSHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         print('connection closed')
-        # IndexWSHandler.clients.remove(self)
         IndexWSHandler.manager.logout(self)
         IndexWSHandler.manager.send_refresh()
 
