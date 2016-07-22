@@ -30,6 +30,7 @@ class UserManager(object):
             self.handle_answer(conn, json['opponent'], json['answer'])
 
     def send_proposal(self, conn, user):
+        print(user in IndexWSHandler.users)
         if user in IndexWSHandler.users:
             IndexWSHandler.users[user].write_message(
                 json.dumps({'proposal': IndexWSHandler.conns[conn][0]}))

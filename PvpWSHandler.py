@@ -13,6 +13,7 @@ class PlayerManager(object):
         return cls._instance
 
     def check_connection(self, user):
+        # check whether in couples
         if PvpWSHandler.players[user] in PvpWSHandler.users:
             # stop periodic task
             opponent = PvpWSHandler.players[user]
