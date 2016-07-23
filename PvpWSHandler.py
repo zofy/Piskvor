@@ -16,21 +16,30 @@ class PlayerManager(object):
         # check whether in couples
         if PvpWSHandler.players[user] in PvpWSHandler.users:
             # stop periodic task
-            opponent = PvpWSHandler.players[user]
-            PvpWSHandler.couples[user] = opponent
-            PvpWSHandler.couples[opponent] = user
+            tornado.ioloop.PeriodicCallback(lambda: self.check_connection(user), 100).stop()
+            if PvpWSHandler.players[user] not in PvpWSHandler.couples:
+                opponent = PvpWSHandler.players[user]
+                PvpWSHandler.couples[user] = opponent
+                PvpWSHandler.couples[opponent] = user
+                PvpWSHandler.users[user].write_message(json.dumps({'connection': 1}))
+
+                # poslat spravu o zacati hry
 
     def end_checking(self, user):
-        pass
-        # send message to redirect if user not connected
-        # stop periodic checking
+        if tornado.ioloop.PeriodicCallback(lambda: self.check_connection(user), 100).is_running():
+            tornado.ioloop.PeriodicCallback(lambda: self.check_connection(user), 100).stop()
+        self.remove_pending(user)
+        if user not in PvpWSHandler.couples:
+            PvpWSHandler.users[user].write_message(json.dumps({'connection': 0}))
+            # send message to redirect / nedoslo k spojeniu
 
     def check_json(self, conn, json):
         if 'nick' in json:
             PvpWSHandler.users[json['nick']] = conn
             PvpWSHandler.conns[conn] = json['nick']
             # start periodic callback
-            tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=5),
+            tornado.ioloop.PeriodicCallback(lambda: self.check_connection(json['nick']), 100).start()
+            tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=3),
                                                          self.end_checking(json['nick']))
 
     def check_message(self, conn, message):
@@ -41,9 +50,16 @@ class PlayerManager(object):
         else:
             self.check_json(conn, message)
 
+    def remove_pending(self, user):
+        try:
+            del PvpWSHandler.pending[user]
+            del PvpWSHandler.pending[PvpWSHandler.pending[user]]
+        except:
+            pass
+
     def logout(self, conn):
         try:
-            del PvpWSHandler.players[PvpWSHandler.conns[conn]]
+            # del PvpWSHandler.pending[PvpWSHandler.conns[conn]]
             del PvpWSHandler.users[PvpWSHandler.conns[conn]]
             del PvpWSHandler.conns[conn]
         except:
@@ -51,7 +67,7 @@ class PlayerManager(object):
 
 
 class PvpWSHandler(tornado.websocket.WebSocketHandler):
-    players = dict()
+    pending = dict()
     users = dict()
     conns = dict()
     couples = dict()
@@ -66,6 +82,7 @@ class PvpWSHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         print('connection closed')
+        PvpWSHandler.manager.remove_pending(PvpWSHandler.conns[self])
         PvpWSHandler.manager.logout(self)
 
     def check_origin(self, origin):

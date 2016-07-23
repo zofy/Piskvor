@@ -27,7 +27,7 @@ ajax.getNick = function(){
         type: 'GET',
         url: '/getNick',
         success: function(json){
-            webSockets.ws.send('{"nick": ' + '"' + json['nick'] + '", ' + '"' + "ts" + '":' + ' "' + json['ts'] + '"' + '}')
+            websockets.ws.send('{"nick": ' + '"' + json['nick'] + '", ' + '"' + "ts" + '":' + ' "' + json['ts'] + '"' + '}')
         },
         dataType: 'json'
     });

@@ -38,7 +38,7 @@ webSockets.handleMessage = function(msg){
     }finally{
         if('refresh' in json) {ajax.refreshUsers();}
         else if ('proposal' in json) {index.showOptions(json['proposal']);}
-        else if ('answer' in json) { if (json['answer'] < 1){alert(json['opponent'] + ' does not want to play with you!')}else{ console.log('redirect takes plaec here'); } }
+        else if ('answer' in json) { if (json['answer'] < 1){alert(json['opponent'] + ' does not want to play with you!')}else{ window.location = '/game'; } }
     }
 }
 
@@ -79,7 +79,7 @@ index.showOptions = function(opponent){
 index.optionSetup = function(){
     $('#options').on('click', 'p', function(){
         var opponent = $($('#options p').get(0)).text().split(" ")[0];
-        if ($(this).html() === 'Yes') {webSockets.ws.send('{"answer": 1, "opponent": "' + opponent + '"}'); }
+        if ($(this).html() === 'Yes') {webSockets.ws.send('{"answer": 1, "opponent": "' + opponent + '"}'); window.location = '/game';}
         else if ($(this).html() === 'No') {webSockets.ws.send('{"answer": 0, "opponent": "' + opponent + '"}');}
     });
 }

@@ -30,7 +30,7 @@ class GameHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self):
         self.render("game.html") if tornado.escape.xhtml_escape(
-            self.current_user) in PvpWSHandler.players else self.redirect("/")
+            self.current_user) in PvpWSHandler.pending else self.redirect("/")
 
 
 class IndexHandler(BaseHandler):

@@ -37,8 +37,8 @@ class UserManager(object):
     def handle_answer(self, conn, user, answer):
         if user in IndexWSHandler.users:
             if answer > 0:
-                PvpWSHandler.players[user] = IndexWSHandler.conns[conn][0]
-                PvpWSHandler.players[IndexWSHandler.conns[conn][0]] = user
+                PvpWSHandler.pending[user] = IndexWSHandler.conns[conn][0]
+                PvpWSHandler.pending[IndexWSHandler.conns[conn][0]] = user
                 # conn.write_message(json.dumps({'answer': 'let`s play'}))
             IndexWSHandler.users[user].write_message(
                 json.dumps({'answer': answer, 'opponent': IndexWSHandler.conns[conn][0]}))
