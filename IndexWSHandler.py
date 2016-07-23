@@ -30,7 +30,6 @@ class UserManager(object):
             self.handle_answer(conn, json['opponent'], json['answer'])
 
     def send_proposal(self, conn, user):
-        print(user in IndexWSHandler.users)
         if user in IndexWSHandler.users:
             IndexWSHandler.users[user].write_message(
                 json.dumps({'proposal': IndexWSHandler.conns[conn][0]}))
@@ -40,9 +39,9 @@ class UserManager(object):
             if answer > 0:
                 PvpWSHandler.players[user] = IndexWSHandler.conns[conn][0]
                 PvpWSHandler.players[IndexWSHandler.conns[conn][0]] = user
-                conn.write_message(json.dumps({'play': 'let`s play'}))
+                # conn.write_message(json.dumps({'answer': 'let`s play'}))
             IndexWSHandler.users[user].write_message(
-                json.dumps({'answer': IndexWSHandler.conns[conn][0]}))
+                json.dumps({'answer': answer, 'opponent': IndexWSHandler.conns[conn][0]}))
 
     def send_refresh(self):
         print('Sending refresh...')
