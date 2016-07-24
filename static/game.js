@@ -19,7 +19,7 @@ websockets.ws.onerror = function(){
 
 websockets.ws.onclose = function(){
     console.log("Closing the connection...");
-    window.location = '/logout';
+    //window.location = '/logout';
 }
 
 ajax.getNick = function(){

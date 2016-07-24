@@ -1,7 +1,9 @@
 import json
+
+import datetime
 import tornado
 
-from PvpWSHandler import PvpWSHandler
+from PvpWSHandler import PvpWSHandler, PlayerManager
 
 
 class UserManager(object):
@@ -37,8 +39,13 @@ class UserManager(object):
     def handle_answer(self, conn, user, answer):
         if user in IndexWSHandler.users:
             if answer > 0:
+                opponent = IndexWSHandler.conns[conn][0]
                 PvpWSHandler.pending[user] = IndexWSHandler.conns[conn][0]
-                PvpWSHandler.pending[IndexWSHandler.conns[conn][0]] = user
+                PvpWSHandler.pending[opponent] = user
+                tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=5),
+                                                             lambda: PlayerManager().remove_pending(user))
+                tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=5),
+                                                             lambda: PlayerManager().remove_pending(opponent))
                 # conn.write_message(json.dumps({'answer': 'let`s play'}))
             IndexWSHandler.users[user].write_message(
                 json.dumps({'answer': answer, 'opponent': IndexWSHandler.conns[conn][0]}))
