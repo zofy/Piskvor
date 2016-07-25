@@ -6,7 +6,6 @@ from tornado.ioloop import PeriodicCallback
 
 
 class PlayerManager(object):
-    # per = None
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -14,16 +13,11 @@ class PlayerManager(object):
             cls._instance = super(PlayerManager, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self):
-        self.per = None
-
-    def check_connection(self, user):
+    def check_connection(self):
         # check whether in couples
         print('checking...')
+        user = PvpWSHandler.me
         if PvpWSHandler.pending[user] in PvpWSHandler.users:
-            # PlayerManager.per.stop()
-            # self.per.stop()
-            # print("stopped")
             if PvpWSHandler.pending[user] not in PvpWSHandler.couples:
                 opponent = PvpWSHandler.pending[user]
                 PvpWSHandler.couples[user] = opponent
@@ -34,7 +28,7 @@ class PlayerManager(object):
                 # poslat spravu o zacati hry
 
     def end_checking(self, user):
-        self.check_connection(user)
+        # self.check_connection(user)
         print("End checking user: " + user)
         if user not in PvpWSHandler.couples:
             PvpWSHandler.users[user].write_message(json.dumps({'connection': 0}))
@@ -44,10 +38,7 @@ class PlayerManager(object):
         if 'nick' in json:
             PvpWSHandler.users[json['nick']] = conn
             PvpWSHandler.conns[conn] = json['nick']
-            # self.per = tornado.ioloop.PeriodicCallback(lambda: self.check_connection(json['nick']), 500)
-            # self.per.start()
-
-            # PlayerManager.per.stop()
+            # PlayerManager.per = tornado.ioloop.PeriodicCallback(self.check_connection, 500)
             tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=2),
                                                          lambda: self.end_checking(json['nick']))
 
