@@ -43,9 +43,9 @@ class UserManager(object):
                 PvpWSHandler.pending[user] = IndexWSHandler.conns[conn][0]
                 PvpWSHandler.pending[opponent] = user
                 tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=5),
-                                                             lambda: PlayerManager().remove_pending(user))
+                                                             lambda: PlayerManager().try_logout(user))
                 tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=5),
-                                                             lambda: PlayerManager().remove_pending(opponent))
+                                                             lambda: PlayerManager().try_logout(opponent))
                 # conn.write_message(json.dumps({'answer': 'let`s play'}))
             IndexWSHandler.users[user].write_message(
                 json.dumps({'answer': answer, 'opponent': IndexWSHandler.conns[conn][0]}))

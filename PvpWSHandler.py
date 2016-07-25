@@ -2,9 +2,11 @@ import datetime
 import json
 
 import tornado
+from tornado.ioloop import PeriodicCallback
 
 
 class PlayerManager(object):
+    # per = None
     _instance = None
 
     def __new__(cls, *args, **kwargs):
@@ -12,24 +14,28 @@ class PlayerManager(object):
             cls._instance = super(PlayerManager, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
+    def __init__(self):
+        self.per = None
+
     def check_connection(self, user):
         # check whether in couples
+        print('checking...')
         if PvpWSHandler.pending[user] in PvpWSHandler.users:
-            # stop periodic task
-            tornado.ioloop.PeriodicCallback(lambda: self.check_connection(user), 100).stop()
+            # PlayerManager.per.stop()
+            # self.per.stop()
+            # print("stopped")
             if PvpWSHandler.pending[user] not in PvpWSHandler.couples:
                 opponent = PvpWSHandler.pending[user]
                 PvpWSHandler.couples[user] = opponent
                 PvpWSHandler.couples[opponent] = user
                 PvpWSHandler.users[user].write_message(json.dumps({'connection': 1}))
+                PvpWSHandler.users[opponent].write_message(json.dumps({'connection': 1}))
 
                 # poslat spravu o zacati hry
 
     def end_checking(self, user):
+        self.check_connection(user)
         print("End checking user: " + user)
-        # if tornado.ioloop.PeriodicCallback(lambda: self.check_connection(user), 100).is_running():
-        #     tornado.ioloop.PeriodicCallback(lambda: self.check_connection(user), 100).stop()
-        # self.remove_pending(user)
         if user not in PvpWSHandler.couples:
             PvpWSHandler.users[user].write_message(json.dumps({'connection': 0}))
             # send message to redirect / nedoslo k spojeniu
@@ -38,9 +44,11 @@ class PlayerManager(object):
         if 'nick' in json:
             PvpWSHandler.users[json['nick']] = conn
             PvpWSHandler.conns[conn] = json['nick']
-            # start periodic callback
-            # tornado.ioloop.PeriodicCallback(lambda: self.check_connection(json['nick']), 100).start()
-            tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=3),
+            # self.per = tornado.ioloop.PeriodicCallback(lambda: self.check_connection(json['nick']), 500)
+            # self.per.start()
+
+            # PlayerManager.per.stop()
+            tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=2),
                                                          lambda: self.end_checking(json['nick']))
 
     def check_message(self, conn, message):
@@ -52,15 +60,29 @@ class PlayerManager(object):
             self.check_json(conn, message)
 
     def remove_pending(self, user):
-        print('testing...')
         if user not in PvpWSHandler.users:
-            print("Removing pending")
-            print("is pendning %s" % (user in PvpWSHandler.pending))
             try:
+                print("Removing pending...")
+                print("is pending %s" % (user in PvpWSHandler.pending))
                 del PvpWSHandler.pending[user]
                 print(PvpWSHandler.pending)
             except:
                 pass
+
+    def remove_couple(self, user):
+        if user not in PvpWSHandler.users:
+            try:
+                print("Removing couple...")
+                del PvpWSHandler.couples[user]
+                del PvpWSHandler.couples[PvpWSHandler.pending[user]]
+                print(PvpWSHandler.couples)
+            except:
+                pass
+
+    def try_logout(self, user):
+        print('testing...')
+        self.remove_couple(user)
+        self.remove_pending(user)
 
     def logout(self, conn):
         try:
@@ -89,7 +111,7 @@ class PvpWSHandler(tornado.websocket.WebSocketHandler):
         user = PvpWSHandler.conns[self]
         PvpWSHandler.manager.logout(self)
         tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=5),
-                                                     lambda: self.manager.remove_pending(user))
+                                                     lambda: self.manager.try_logout(user))
 
     def check_origin(self, origin):
         # host = self.request.headers.get('Host')
