@@ -13,7 +13,7 @@ ajax.getNick = function(){
         type: 'GET',
         url: '/getNick',
         success: function(json){
-            alert("Your name is: " + json['nick']);
+//            alert("Your name is: " + json['nick']);
 //            alert("Your ts is: " + json['ts']);
             webSockets.ws.send('{"nick": ' + '"' + json['nick'] + '", ' + '"' + "ts" + '":' + ' "' + json['ts'] + '"' + '}')
         },
@@ -39,6 +39,7 @@ webSockets.handleMessage = function(msg){
         if('refresh' in json) {ajax.refreshUsers();}
         else if ('proposal' in json) {index.showOptions(json['proposal']);}
         else if ('answer' in json) { if (json['answer'] < 1){alert(json['opponent'] + ' does not want to play with you!')}else{ window.location = '/game'; } }
+        else if ('available' in json) { console.log(json['available'] + ' is currently unavailable.'); }
     }
 }
 

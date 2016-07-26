@@ -13,26 +13,32 @@ class PlayerManager(object):
             cls._instance = super(PlayerManager, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def check_connection(self):
-        # check whether in couples
+    def check_connection(self, user):
         print('checking...')
-        user = PvpWSHandler.me
         if PvpWSHandler.pending[user] in PvpWSHandler.users:
             if PvpWSHandler.pending[user] not in PvpWSHandler.couples:
                 opponent = PvpWSHandler.pending[user]
                 PvpWSHandler.couples[user] = opponent
                 PvpWSHandler.couples[opponent] = user
-                PvpWSHandler.users[user].write_message(json.dumps({'connection': 1}))
-                PvpWSHandler.users[opponent].write_message(json.dumps({'connection': 1}))
+                PvpWSHandler.users[user].write_message(json.dumps({'connection': 1, 'begin': 0}))
+                PvpWSHandler.users[opponent].write_message(json.dumps({'connection': 1, 'begin': 1}))
 
                 # poslat spravu o zacati hry
 
     def end_checking(self, user):
-        # self.check_connection(user)
+        self.check_connection(user)
         print("End checking user: " + user)
         if user not in PvpWSHandler.couples:
             PvpWSHandler.users[user].write_message(json.dumps({'connection': 0}))
             # send message to redirect / nedoslo k spojeniu
+
+    def handle_game(self, conn, point):
+        me = PvpWSHandler.conns[conn]
+        if PvpWSHandler.couples[me] not in PvpWSHandler.users:
+            conn.write_message("connection lost")
+        else:
+            opponent = PvpWSHandler.couples[me]
+            PvpWSHandler.users[opponent].write_message("sending point" + point)
 
     def check_json(self, conn, json):
         if 'nick' in json:
@@ -41,6 +47,8 @@ class PlayerManager(object):
             # PlayerManager.per = tornado.ioloop.PeriodicCallback(self.check_connection, 500)
             tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=2),
                                                          lambda: self.end_checking(json['nick']))
+        elif 'point' in json:
+            self.handle_game(conn, json['point'])
 
     def check_message(self, conn, message):
         try:
@@ -64,6 +72,9 @@ class PlayerManager(object):
         if user not in PvpWSHandler.users:
             try:
                 print("Removing couple...")
+                opponent = PvpWSHandler.couples[user]
+                if opponent in PvpWSHandler.users:
+                    PvpWSHandler.users[opponent].write_message('connection lost')
                 del PvpWSHandler.couples[user]
                 del PvpWSHandler.couples[PvpWSHandler.pending[user]]
                 print(PvpWSHandler.couples)
@@ -101,7 +112,7 @@ class PvpWSHandler(tornado.websocket.WebSocketHandler):
         print('connection closed')
         user = PvpWSHandler.conns[self]
         PvpWSHandler.manager.logout(self)
-        tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=5),
+        tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=4),
                                                      lambda: self.manager.try_logout(user))
 
     def check_origin(self, origin):

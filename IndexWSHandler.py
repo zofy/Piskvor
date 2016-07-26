@@ -15,6 +15,7 @@ class UserManager(object):
         return cls._instance
 
     def logout(self, conn):
+        self.delete_proposed(IndexWSHandler.conns[conn][0])
         try:
             del IndexWSHandler.users[IndexWSHandler.conns[conn][0]]
             del IndexWSHandler.conns[conn]
@@ -32,11 +33,24 @@ class UserManager(object):
             self.handle_answer(conn, json['opponent'], json['answer'])
 
     def send_proposal(self, conn, user):
-        if user in IndexWSHandler.users:
+        if user in IndexWSHandler.proposed:
+            conn.write_message(json.dumps({'available': user}))
+        elif user in IndexWSHandler.users:
             IndexWSHandler.users[user].write_message(
                 json.dumps({'proposal': IndexWSHandler.conns[conn][0]}))
+            me = IndexWSHandler.conns[conn][0]
+            IndexWSHandler.proposed[me] = user
+            IndexWSHandler.proposed[user] = me
+
+    def delete_proposed(self, user):
+        if user in IndexWSHandler.proposed:
+            opponent = IndexWSHandler.proposed[user]
+            IndexWSHandler.users[opponent].write_message(json.dumps({'connection': 'lost'}))
+            del IndexWSHandler.proposed[user]
+            del IndexWSHandler.proposed[opponent]
 
     def handle_answer(self, conn, user, answer):
+        self.delete_proposed(user)
         if user in IndexWSHandler.users:
             if answer > 0:
                 opponent = IndexWSHandler.conns[conn][0]
@@ -46,7 +60,6 @@ class UserManager(object):
                                                              lambda: PlayerManager().try_logout(user))
                 tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=5),
                                                              lambda: PlayerManager().try_logout(opponent))
-                # conn.write_message(json.dumps({'answer': 'let`s play'}))
             IndexWSHandler.users[user].write_message(
                 json.dumps({'answer': answer, 'opponent': IndexWSHandler.conns[conn][0]}))
 
@@ -67,6 +80,7 @@ class UserManager(object):
 class IndexWSHandler(tornado.websocket.WebSocketHandler):
     users = dict()
     conns = dict()
+    proposed = dict()
     manager = UserManager()
 
     def open(self):
