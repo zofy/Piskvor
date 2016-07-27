@@ -4,18 +4,16 @@
 
 var index = {};
 var ajax = {};
-var webSockets = {};
+var websockets = {};
 
-webSockets.ws = new WebSocket('ws://localhost:8000/ws_index');
+websockets.ws = new WebSocket('ws://localhost:8000/ws_index');
 
 ajax.getNick = function(){
     $.ajax({
         type: 'GET',
         url: '/getNick',
         success: function(json){
-//            alert("Your name is: " + json['nick']);
-//            alert("Your ts is: " + json['ts']);
-            webSockets.ws.send('{"nick": ' + '"' + json['nick'] + '", ' + '"' + "ts" + '":' + ' "' + json['ts'] + '"' + '}')
+            websockets.ws.send('{"nick": ' + '"' + json['nick'] + '", ' + '"' + "ts" + '":' + ' "' + json['ts'] + '"' + '}')
         },
         dataType: 'json'
     });
@@ -30,7 +28,7 @@ ajax.refreshUsers = function(){
     });
 }
 
-webSockets.handleMessage = function(msg){
+websockets.handleMessage = function(msg){
     try{
         var json = JSON.parse(msg);
     }catch(e){
@@ -43,21 +41,22 @@ webSockets.handleMessage = function(msg){
     }
 }
 
-webSockets.ws.onopen = function(){
+websockets.ws.onopen = function(){
     console.log('Getting the name...');
     ajax.getNick();
 }
 
-webSockets.ws.onmessage = function(msg){
+websockets.ws.onmessage = function(msg){
     console.log("Message: " + msg.data);
-    webSockets.handleMessage(msg.data);
+    websockets.handleMessage(msg.data);
 }
 
-webSockets.ws.onerror = function(){
+websockets.ws.onerror = function(){
     console.log('An error occurred!');
+    $()
 }
 
-webSockets.ws.onclose = function(){
+websockets.ws.onclose = function(){
     console.log('Connection closed!');
 }
 
@@ -66,27 +65,36 @@ index.refreshUsers = function(json){
     var newHtml = '';
     console.log(json.users);
     json.users.forEach(function(user){
-        newHtml += "<p>" + user + "</p>";
+        newHtml += '<li><span style="cursor: pointer"><i class="fa fa-user-plus"></i></span>' + user + '</li>';
     });
-    $('#users').html(newHtml);
+    $('#search_results').html(newHtml);
 }
 
 index.showOptions = function(opponent){
     var option = '<p>' + opponent + ' wants to play with you!' + '</p>' +
-        '<p>Yes</p> <p>No</p>';
-    $('#options').html(option);
+        '<button>Accept</button> <button>Decline</button>';
+    $('#notifications').html(option);
 }
 
 index.optionSetup = function(){
-    $('#options').on('click', 'p', function(){
-        var opponent = $($('#options p').get(0)).text().split(" ")[0];
-        if ($(this).html() === 'Yes') {webSockets.ws.send('{"answer": 1, "opponent": "' + opponent + '"}'); window.location = '/game';}
-        else if ($(this).html() === 'No') {webSockets.ws.send('{"answer": 0, "opponent": "' + opponent + '"}');}
+    $('#notifications').on('click', 'button', function(){
+        var opponent = $($('#notifications p').get(0)).text().split(" ")[0];
+        console.log(opponent);
+        if ($(this).html() === 'Accept') {websockets.ws.send('{"answer": 1, "opponent": "' + opponent + '"}'); window.location = '/game';}
+        else if ($(this).html() === 'Decline') {websockets.ws.send('{"answer": 0, "opponent": "' + opponent + '"}');}
+    });
+}
+
+index.proposalSetup = function(){
+    $('ul').on('click', 'span', function(){
+        console.log('Proposal on the way!');
+        websockets.ws.send('{"proposal": "' + $($(this).parent()).text() + '"}');
     });
 }
 
 index.init = function(){
     index.optionSetup();
+    index.proposalSetup();
 }
 
 index.init();
