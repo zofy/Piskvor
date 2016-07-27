@@ -2,8 +2,6 @@ import json
 
 import time
 import tornado
-from tornado import gen
-from tornado.httpclient import AsyncHTTPClient
 
 from IndexWSHandler import IndexWSHandler
 from PvpWSHandler import PvpWSHandler
@@ -24,6 +22,13 @@ class UserHandler(BaseHandler):
     def get(self):
         self.write(json.dumps({'users': [user for user in IndexWSHandler.users if
                                          user != tornado.escape.xhtml_escape(self.current_user)]}))
+
+    @tornado.web.authenticated
+    def post(self):
+        looked_for = self.get_argument("name")[2::4]
+        self.write(json.dumps({'users': [user for user in IndexWSHandler.users if
+                                         user != tornado.escape.xhtml_escape(
+                                             self.current_user) and looked_for in user]}))
 
 
 class GameHandler(BaseHandler):
@@ -50,7 +55,6 @@ class LoginHandler(BaseHandler):
     def get(self):
         self.clear_cookie("user")
         self.clear_cookie("timestamp")
-        # self.clear_all_cookies()
         self.render("login.html")
 
     def post(self):
@@ -63,5 +67,4 @@ class LogoutHandler(BaseHandler):
     def get(self):
         self.clear_cookie("user")
         self.clear_cookie("timestamp")
-        # self.clear_all_cookies()
         self.redirect("/")

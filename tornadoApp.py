@@ -40,6 +40,7 @@ class Application(tornado.web.Application):
             (r"/", IndexHandler),
             (r"/getNick", BaseHandler),
             (r"/liveUsers", UserHandler),
+            (r"/getPlayers", UserHandler),
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),
             (r"/game", GameHandler),
@@ -49,7 +50,7 @@ class Application(tornado.web.Application):
         settings = {
             "cookie_secret": "__BIG_CITY_LIFE__",
             "login_url": "/login",
-            "xsrf_cookies": True,
+            "xsrf_cookies": False,
             "debug": True,
             "template_path": os.path.join(BASE_DIR, "templates"),
             "static_path": os.path.join(BASE_DIR, "static")
