@@ -32,13 +32,18 @@ class PlayerManager(object):
             PvpWSHandler.users[user].write_message(json.dumps({'connection': 0}))
             # send message to redirect / nedoslo k spojeniu
 
-    def handle_game(self, conn, point):
+    def handle_game(self, conn, entity_name, entity):
         me = PvpWSHandler.conns[conn]
+        if me not in PvpWSHandler.couples:
+            return
         if PvpWSHandler.couples[me] not in PvpWSHandler.users:
             conn.write_message("connection lost")
         else:
             opponent = PvpWSHandler.couples[me]
-            PvpWSHandler.users[opponent].write_message("sending point" + point)
+            if entity_name == 'point':
+                PvpWSHandler.users[opponent].write_message(json.dumps({"point": entity}))
+            elif entity_name == 'color':
+                PvpWSHandler.users[opponent].write_message(json.dumps({"color": entity}))
 
     def check_json(self, conn, json):
         if 'nick' in json:
@@ -47,7 +52,9 @@ class PlayerManager(object):
             tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=2),
                                                          lambda: self.end_checking(json['nick']))
         elif 'point' in json:
-            self.handle_game(conn, json['point'])
+            self.handle_game(conn, 'point', json['point'])
+        elif 'color' in json:
+            self.handle_game(conn, 'color', json['color'])
 
     def check_message(self, conn, message):
         try:
@@ -109,10 +116,11 @@ class PvpWSHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         print('connection closed')
-        user = PvpWSHandler.conns[self]
+        if self in PvpWSHandler.conns:
+            user = PvpWSHandler.conns[self]
+            tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=4),
+                                                         lambda: self.manager.try_logout(user))
         PvpWSHandler.manager.logout(self)
-        tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=4),
-                                                     lambda: self.manager.try_logout(user))
 
     def check_origin(self, origin):
         # host = self.request.headers.get('Host')

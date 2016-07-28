@@ -68,7 +68,7 @@ websockets.ws.onmessage = function(msg){
 
 websockets.ws.onerror = function(){
     console.log('An error occurred!');
-    $()
+    $('#notifications').html('<h1>An error with connection occurred</h1>');
 }
 
 websockets.ws.onclose = function(){
