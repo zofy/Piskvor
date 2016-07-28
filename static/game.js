@@ -4,6 +4,8 @@ var websockets = {};
 
 websockets.ws = new WebSocket('ws://localhost:8000/ws_game');
 
+// WEBSOCKETS FUNCTIONS
+
 websockets.ws.onopen = function(){
     console.log('Joining the game...');
     ajax.getNick();
@@ -22,6 +24,8 @@ websockets.ws.onclose = function(){
     //window.location = '/logout';
 }
 
+// AJAX FUNCTIONS
+
 ajax.getNick = function(){
     $.ajax({
         type: 'GET',
@@ -32,3 +36,23 @@ ajax.getNick = function(){
         dataType: 'json'
     });
 }
+
+// GAME FUNCTIONS
+
+game.boardSetup = function(){
+    $('.square.middle').on('click', function(){
+        console.log('You clicked ' + game.board.index($(this)));
+
+    });
+}
+
+game.changeColor = function(){
+
+}
+
+game.init = function(){
+    game.board = $('.square.middle');
+    game.boardSetup();
+}
+
+game.init();

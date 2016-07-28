@@ -44,7 +44,6 @@ class PlayerManager(object):
         if 'nick' in json:
             PvpWSHandler.users[json['nick']] = conn
             PvpWSHandler.conns[conn] = json['nick']
-            # PlayerManager.per = tornado.ioloop.PeriodicCallback(self.check_connection, 500)
             tornado.ioloop.IOLoop.instance().add_timeout(datetime.timedelta(seconds=2),
                                                          lambda: self.end_checking(json['nick']))
         elif 'point' in json:
