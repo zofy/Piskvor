@@ -1,10 +1,13 @@
 import json
 
 import time
+
 import tornado
+from tornado import gen
 
 from IndexWSHandler import IndexWSHandler
 from PvpWSHandler import PvpWSHandler
+from tornado.httpclient import AsyncHTTPClient
 
 
 class BaseHandler(tornado.web.RequestHandler):
@@ -41,7 +44,11 @@ class GameHandler(BaseHandler):
 
 class PvCHandler(BaseHandler):
     @tornado.web.authenticated
+    @gen.coroutine
     def get(self):
+        http_client = AsyncHTTPClient()
+        response = yield http_client.fetch("http://localhost:8000/")
+        print(response)
         self.render("game.html", javascript="comp")
 
 

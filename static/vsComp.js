@@ -17,7 +17,6 @@ game.start = function(){
     $(game.me).css('background-color', color);
     $(game.opponent).css('background-color', compColor);
     game.forToggling = $('.square.middle');
-    console.log(game.forToggling);
 }
 
 game.changeOpponent = function(color){
