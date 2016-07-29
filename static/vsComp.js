@@ -1,69 +1,32 @@
 var game = {};
-var ajax = {};
-var websockets = {};
+var comp = {};
 
-websockets.ws = new WebSocket('ws://localhost:8000/ws_game');
+// COMPUTER FUNCTIONS
 
-// WEBSOCKETS FUNCTIONS
+comp.makeMove = function(){
 
-websockets.handleMessage = function(msg){
-    try {
-        var json = JSON.parse(msg);
-    } catch (e){
-        console.log(msg);
-    } finally {
-        if ('color' in json) { game.changeOpponent(json['color']); console.log('efewf');}
-        else if ('connection' in json) { if (json['connection'] === 1) {game.start(); if (json['begin'] === 1) { $(game.forToggling).removeClass('noEvent') } } else { console.log('Lost conn...') } }
-        else if('point' in json) { game.markOpponent(json['point']); }
-    }
-}
-
-websockets.ws.onopen = function(){
-    console.log('Joining the game...');
-    ajax.getNick();
-}
-
-websockets.ws.onmessage = function(msg){
-    console.log("Message: " + msg.data);
-    websockets.handleMessage(msg.data);
-}
-
-websockets.ws.onerror = function(){
-    console.log("An error occurred!");
-    $('h1').html("An error with connection occurred");
-}
-
-websockets.ws.onclose = function(){
-    console.log("Closing the connection...");
-    //window.location = '/logout';
-}
-
-// AJAX FUNCTIONS
-
-ajax.getNick = function(){
-    $.ajax({
-        type: 'GET',
-        url: '/getNick',
-        success: function(json){
-            websockets.ws.send('{"nick": ' + '"' + json['nick'] + '", ' + '"' + "ts" + '":' + ' "' + json['ts'] + '"' + '}')
-        },
-        dataType: 'json'
-    });
 }
 
 // GAME FUNCTIONS
 
+game.start = function(){
+    var color = game.randomColor();
+    var compColor = game.randomColor();
+    game.myColor = color;
+    game.opponentsColor = compColor;
+    $(game.me).css('background-color', color);
+    $(game.opponent).css('background-color', compColor);
+    game.forToggling = $('.square.middle');
+    console.log(game.forToggling);
+}
+
 game.changeOpponent = function(color){
     $(game.opponent).css('background-color', color);
-    game.opponentsColor = color;
     game.changeSquares(color, game.opponentSquares);
 }
 
 game.markOpponent = function(idx){
     $($(game.board).get(idx)).css('background-color', game.opponentsColor);
-    var square = $(game.board).get(idx);
-    game.forToggling.splice($(game.forToggling).index(square), 1);
-    $(game.forToggling).removeClass('noEvent');
 }
 
 game.changeSquares = function(color, squares){
@@ -76,13 +39,12 @@ game.boardSetup = function(){
     $('.square.middle').on('click', function(){
         $(this).css('background-color', game.myColor);
         var idx = game.board.index(this);
-        game.addPoint(idx, game.myPoints);
-        if (game.checkWin(game.myPoints) === true) { console.log('You won!'); }
         game.mySquares.push(idx);
+        game.addPoint(idx, game.myPoints);
         $(this).addClass('noEvent');
         game.forToggling.splice($(game.forToggling).index(this), 1);
         $(game.forToggling).addClass('noEvent');
-        websockets.ws.send('{"point": "' + idx + '"}');
+        if (game.checkWin(game.myPoints) === true) console.log('winner huhuhuuuu');
     });
     game.me.on('click', function(){
         var color = game.randomColor();
@@ -94,15 +56,6 @@ game.boardSetup = function(){
 
 game.randomColor = function(){
     return 'rgb(' + Math.round(256*Math.random()) + ', ' + Math.round(256*Math.random()) + ', ' + Math.round(256*Math.random()) + ')';
-}
-
-game.start = function(){
-    var color = game.randomColor();
-    game.myColor = color;
-    $(game.me).css('background-color', color);
-    websockets.ws.send('{"color": "' + color + '"}');
-    game.forToggling = $('.square.middle');
-    $(game.forToggling).addClass('noEvent');
 }
 
 game.addPoint = function(point, collection){
@@ -136,10 +89,12 @@ game.init = function(){
     game.myColor = game.me.css('background-color');
     game.opponentsColor = game.opponent.css('background-color');
     game.mySquares = [];
-    game.myPoints = [[[], [], []], [[], [], []], [], []];
     game.opponentSquares = [];
+    game.myPoints = [[[], [], []], [[], [], []], [], []];
+    game.opponentPoints = [[[], [], []], [[], [], []], [], []];
     game.forToggling = [];
     game.boardSetup();
+    game.start();
 }
 
 game.init();

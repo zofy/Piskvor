@@ -125,10 +125,17 @@ index.searchSetup = function(){
     });
 }
 
+index.vsCompSetup = function(){
+    $('#container button').on('click', function(){
+        window.location = '/comp';
+    });
+}
+
 index.init = function(){
     index.optionSetup();
     index.proposalSetup();
     index.searchSetup();
+    index.vsCompSetup();
 }
 
 index.init();

@@ -15,6 +15,8 @@ class PlayerManager(object):
 
     def check_connection(self, user):
         print('checking...')
+        if user not in PvpWSHandler.pending:
+            return # tu moze prist redirect na menu
         if PvpWSHandler.pending[user] in PvpWSHandler.users:
             if PvpWSHandler.pending[user] not in PvpWSHandler.couples:
                 opponent = PvpWSHandler.pending[user]

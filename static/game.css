@@ -25,3 +25,7 @@ h1 {
 .color {
     margin: 70% 40% auto;
 }
+
+.noEvent {
+    pointer-events: none;
+}

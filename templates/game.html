@@ -25,6 +25,10 @@
             <h2 class="color">My Color</h2>
         </div>
     </div>
+{% if javascript == 'game' %}
 <script type="text/javascript" src="{{ static_url('game.js') }}"></script>
+{% elif javascript == 'comp' %}
+<script type="text/javascript" src="{{ static_url('vsComp.js') }}"></script>
+{% end %}
 </body>
 </html>

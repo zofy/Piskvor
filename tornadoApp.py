@@ -13,7 +13,7 @@ from tornado.options import options
 
 from IndexWSHandler import IndexWSHandler
 from PvpWSHandler import PvpWSHandler
-from views import LoginHandler, GameHandler, LogoutHandler, UserHandler, IndexHandler, BaseHandler
+from views import LoginHandler, GameHandler, LogoutHandler, UserHandler, IndexHandler, BaseHandler, PvCHandler
 
 is_closing = False
 
@@ -44,6 +44,7 @@ class Application(tornado.web.Application):
             (r"/login", LoginHandler),
             (r"/logout", LogoutHandler),
             (r"/game", GameHandler),
+            (r"/comp", PvCHandler),
             (r'/ws_index', IndexWSHandler),
             (r'/ws_game', PvpWSHandler),
         ]
