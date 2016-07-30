@@ -24,8 +24,8 @@ class PlayerManager(object):
                 PvpWSHandler.couples[opponent] = user
                 PvpWSHandler.users[user].write_message(json.dumps({'connection': 1, 'begin': 0}))
                 PvpWSHandler.users[opponent].write_message(json.dumps({'connection': 1, 'begin': 1}))
-
-                # poslat spravu o zacati hry
+                PvpWSHandler.players[user] = ['red', []]
+                PvpWSHandler.players[opponent] = ['red', []]
 
     def end_checking(self, user):
         self.check_connection(user)
@@ -44,8 +44,10 @@ class PlayerManager(object):
             opponent = PvpWSHandler.couples[me]
             if entity_name == 'point':
                 PvpWSHandler.users[opponent].write_message(json.dumps({"point": entity}))
+                PvpWSHandler.players[me][1].append(entity)
             elif entity_name == 'color':
                 PvpWSHandler.users[opponent].write_message(json.dumps({"color": entity}))
+                PvpWSHandler.players[me][0] = entity
 
     def check_json(self, conn, json):
         if 'nick' in json:
@@ -107,6 +109,7 @@ class PvpWSHandler(tornado.websocket.WebSocketHandler):
     users = dict()
     conns = dict()
     couples = dict()
+    players = dict()
     manager = PlayerManager()
 
     def open(self):

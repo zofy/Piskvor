@@ -62,6 +62,7 @@ game.changeOpponent = function(color){
 game.markOpponent = function(idx){
     $($(game.board).get(idx)).css('background-color', game.opponentsColor);
     var square = $(game.board).get(idx);
+    game.opponentSquares.push(idx);
     game.forToggling.splice($(game.forToggling).index(square), 1);
     $(game.forToggling).removeClass('noEvent');
 }
@@ -89,7 +90,10 @@ game.boardSetup = function(){
         game.myColor = color;
         $(this).css('background-color', color);
         game.changeSquares(color, game.mySquares);
+        websockets.ws.send('{"color": "' + color + '"}');
     });
+    game.forToggling = $('.square.middle');
+    $(game.forToggling).addClass('noEvent');
 }
 
 game.randomColor = function(){
@@ -101,8 +105,6 @@ game.start = function(){
     game.myColor = color;
     $(game.me).css('background-color', color);
     websockets.ws.send('{"color": "' + color + '"}');
-    game.forToggling = $('.square.middle');
-    $(game.forToggling).addClass('noEvent');
 }
 
 game.addPoint = function(point, collection){
