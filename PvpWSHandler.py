@@ -16,16 +16,19 @@ class PlayerManager(object):
     def check_connection(self, user):
         print('checking...')
         if user not in PvpWSHandler.pending:
-            return # tu moze prist redirect na menu
+            return  # tu moze prist redirect na menu
         if PvpWSHandler.pending[user] in PvpWSHandler.users:
+            opponent = PvpWSHandler.pending[user]
             if PvpWSHandler.pending[user] not in PvpWSHandler.couples:
-                opponent = PvpWSHandler.pending[user]
                 PvpWSHandler.couples[user] = opponent
                 PvpWSHandler.couples[opponent] = user
                 PvpWSHandler.users[user].write_message(json.dumps({'connection': 1, 'begin': 0}))
                 PvpWSHandler.users[opponent].write_message(json.dumps({'connection': 1, 'begin': 1}))
-                PvpWSHandler.players[user] = ['red', []]
-                PvpWSHandler.players[opponent] = ['red', []]
+                PvpWSHandler.players[user] = [None, []]
+                PvpWSHandler.players[opponent] = [None, []]
+            elif PvpWSHandler.players[user] is not None:
+                PvpWSHandler.users[user].write_message(json.dumps(
+                    {'continue': 1, 'me': PvpWSHandler.players[user], 'opponent': PvpWSHandler.players[opponent]}))
 
     def end_checking(self, user):
         self.check_connection(user)
