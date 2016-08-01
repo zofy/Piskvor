@@ -81,7 +81,7 @@ game.continueSetup = function(myArray, opponentsArray){
     game.opponentSquares = opponentsArray[1];
     game.changeSquares(opponentsArray[0], opponentsArray[1]);
     game.continueToggling();
-    if (myArray[2] )
+    if (myArray[2] > 0){ $(game.forToggling).removeClass('noEvent'); }
 }
 
 game.changeOpponent = function(color){
@@ -109,7 +109,7 @@ game.boardSetup = function(){
         $(this).css('background-color', game.myColor);
         var idx = game.board.index(this);
         game.addPoint(idx, game.myPoints);
-        if (game.checkWin(game.myPoints) === true) { console.log('You won!'); }
+        if (game.checkWin(game.myPoints) === true) { console.log('You won!'); $('h1').text('You won!'); }
         game.mySquares.push(idx);
         $(this).addClass('noEvent');
         game.forToggling.splice($(game.forToggling).index(this), 1);
