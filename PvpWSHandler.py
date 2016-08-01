@@ -24,11 +24,11 @@ class PlayerManager(object):
                 PvpWSHandler.couples[opponent] = user
                 PvpWSHandler.users[user].write_message(json.dumps({'connection': 1, 'begin': 0}))
                 PvpWSHandler.users[opponent].write_message(json.dumps({'connection': 1, 'begin': 1}))
-                PvpWSHandler.players[user] = [None, []]
-                PvpWSHandler.players[opponent] = [None, []]
+                PvpWSHandler.players[user] = [None, [], -1]
+                PvpWSHandler.players[opponent] = [None, [], 1]
             elif PvpWSHandler.players[user] is not None:
                 PvpWSHandler.users[user].write_message(json.dumps(
-                    {'continue': 1, 'me': PvpWSHandler.players[user], 'opponent': PvpWSHandler.players[opponent]}))
+                    {'continue': PvpWSHandler.players[user][2], 'me': PvpWSHandler.players[user], 'opponent': PvpWSHandler.players[opponent]}))
 
     def end_checking(self, user):
         self.check_connection(user)
@@ -48,6 +48,8 @@ class PlayerManager(object):
             if entity_name == 'point':
                 PvpWSHandler.users[opponent].write_message(json.dumps({"point": entity}))
                 PvpWSHandler.players[me][1].append(entity)
+                PvpWSHandler.players[me][2] *= -1
+                PvpWSHandler.players[opponent][2] *= -1
             elif entity_name == 'color':
                 PvpWSHandler.users[opponent].write_message(json.dumps({"color": entity}))
                 PvpWSHandler.players[me][0] = entity

@@ -13,8 +13,9 @@ websockets.handleMessage = function(msg){
         console.log(msg);
     } finally {
         if ('color' in json) { game.changeOpponent(json['color']); console.log('efewf');}
-        else if ('connection' in json) { if (json['connection'] === 1) {game.start(); if (json['begin'] === 1) { $(game.forToggling).removeClass('noEvent') } } else { console.log('Lost conn...') } }
+        else if ('connection' in json) { if (json['connection'] === 1) {game.start(); if (json['begin'] === 1) { $(game.forToggling).removeClass('noEvent') } } else { console.log('Lost conn...'); window.location = '/'; } }
         else if('point' in json) { game.markOpponent(json['point']); }
+        else if ('continue' in json) { game.continueSetup(json['me'], json['opponent']);  }
     }
 }
 
@@ -52,6 +53,36 @@ ajax.getNick = function(){
 }
 
 // GAME FUNCTIONS
+
+game.continueToggling = function(){
+    var alreadyClicked = [];
+    $.merge($.merge(alreadyClicked, game.mySquares), game.opponentSquares);
+    for(var i = 0; i < alreadyClicked.length; i++){
+        var square = $(game.board).get(alreadyClicked[i]);
+        $(square).addClass('noEvent');
+        $(game.forToggling).splice($(game.forToggling).index(square), 1);
+    }
+}
+
+game.fillMyPoints = function(array){
+    for(var i = 0; i < array.length; i++){
+        game.mySquares.push(array[i]);
+        game.addPoint(array[i], game.myPoints);
+    }
+}
+
+game.continueSetup = function(myArray, opponentsArray){
+    game.myColor = myArray[0];
+    game.fillMyPoints(myArray[1]);
+    $(game.me).css('background-color', myArray[0]);
+    $(game.opponent).css('background-color', opponentsArray[0]);
+    game.changeSquares(myArray[0], myArray[1]);
+    game.opponentsColor = opponentsArray[0];
+    game.opponentSquares = opponentsArray[1];
+    game.changeSquares(opponentsArray[0], opponentsArray[1]);
+    game.continueToggling();
+    if (myArray[2] )
+}
 
 game.changeOpponent = function(color){
     $(game.opponent).css('background-color', color);
@@ -92,7 +123,6 @@ game.boardSetup = function(){
         game.changeSquares(color, game.mySquares);
         websockets.ws.send('{"color": "' + color + '"}');
     });
-    game.forToggling = $('.square.middle');
     $(game.forToggling).addClass('noEvent');
 }
 
@@ -140,7 +170,7 @@ game.init = function(){
     game.mySquares = [];
     game.myPoints = [[[], [], []], [[], [], []], [], []];
     game.opponentSquares = [];
-    game.forToggling = [];
+    game.forToggling = $('.square.middle');
     game.boardSetup();
 }
 
