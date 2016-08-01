@@ -60,7 +60,7 @@ game.continueToggling = function(){
     for(var i = 0; i < alreadyClicked.length; i++){
         var square = $(game.board).get(alreadyClicked[i]);
         $(square).addClass('noEvent');
-        $(game.forToggling).splice($(game.forToggling).index(square), 1);
+        game.forToggling.splice($(game.forToggling).index(square), 1);
     }
 }
 
