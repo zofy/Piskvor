@@ -21,8 +21,6 @@ comp.init = function(){
 }
 
 comp.makeMove = function(player, depth){
-    var player = typeof player !== 'undefined'? player: 1;
-    var depth = typeof depth !== 'undefined'? depth: 0;
     if (game.checkWin(game.opponentPoints) === true) {
         return 10;
     } else if (game.checkWin(game.myPoints) === true) {
@@ -35,16 +33,9 @@ comp.makeMove = function(player, depth){
     var scores = [], moves = [];
     for(var i = 0; i < game.freeSquares.length; i++){
         var square = game.freeSquares[i];
-        if (moves.indexOf(square) > -1){
-            console.log(moves);
-            console.log(game.freeSquares);
-            continue;
-        }
         moves.push(square);
-        //console.log(moves);
 
         if(player === 1){
-            //moves.push(square);
             game.opponentSquares.push(square);
             game.addPoint(square, game.opponentPoints);
             game.freeSquares.splice(i, 1);
@@ -53,7 +44,6 @@ comp.makeMove = function(player, depth){
             game.removePoint(square, game.opponentPoints);
             game.opponentSquares.splice(game.opponentSquares.indexOf(square), 1);
         }else if (player === 0){
-            //moves.push(square);
             game.mySquares.push(square);
             game.addPoint(square, game.myPoints);
             game.freeSquares.splice(i, 1);
@@ -66,6 +56,7 @@ comp.makeMove = function(player, depth){
     if (player === 1){
         var maxScoreIdx = scores.indexOf(Math.max.apply(Math, scores));
         comp.result = moves[maxScoreIdx];
+        console.log(moves);
         return scores[maxScoreIdx];
     } else if (player === 0) {
         var minScoreIdx = scores.indexOf(Math.min.apply(Math, scores));
@@ -109,7 +100,7 @@ game.play = function(){
     //console.log(game.freeSquares);
     //console.log('Mypoints ' + game.mySquares);
     //console.log('Comps points ' + game.opponentSquares);
-    comp.makeMove();
+    comp.makeMove(1, 0);
     var square = comp.result;
     console.log(square);
     game.freeSquares.splice(game.freeSquares.indexOf(square), 1);
