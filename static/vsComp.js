@@ -14,9 +14,9 @@ comp.makeMove = function(player, depth, k){
     var depth = typeof depth !== 'undefined'? depth: 0;
     var k = typeof k !== 'undefined'? k: 0;
     if (game.checkWin(game.opponentPoints) === true) {
-        return 10;
+        return 10 - depth;
     } else if (game.checkWin(game.myPoints) === true) {
-        return -10;
+        return depth - 10;
     } else if (k === game.freeSquares.length) {
         return 0;
     }
