@@ -36,8 +36,8 @@ comp.makeMove = function(player, depth){
     for(var i = 0; i < game.freeSquares.length; i++){
         var square = game.freeSquares[i];
         if (moves.indexOf(square) > -1){
-        //    console.log(moves);
-        //    console.log(square);
+            console.log(moves);
+            console.log(game.freeSquares);
             continue;
         }
         moves.push(square);
