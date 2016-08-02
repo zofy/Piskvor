@@ -3,64 +3,42 @@ var comp = {};
 
 // COMPUTER FUNCTIONS
 
-comp.copyArray = function(collection){
-    var output = [];
-    for(var i = 0; i < collection.length; i++){
-        output.push(collection[i]);
-    }
-    return output;
+comp.swap = function(array, pos1, pos2){
+    var temp = array[pos1];
+    array[pos1] = array[pos2];
+    array[pos2] = temp;
 }
 
-comp.init = function(){
-    comp.result = null;
-    comp.mySquares = comp.copyArray(game.mySquares);
-    comp.opponentSquares = comp.copyArray(game.opponentSquares);
-    comp.myPoints = comp.copyArray(game.myPoints);
-    comp.opponentPoints = comp.copyArray(game.opponentPoints);
-    comp.freeSquares = comp.copyArray(game.freeSquares);
-}
-
-comp.makeMove = function(player, depth){
+comp.makeMove = function(player, depth, k){
     var player = typeof player !== 'undefined'? player: 1;
     var depth = typeof depth !== 'undefined'? depth: 0;
+    var k = typeof k !== 'undefined'? k: 0;
     if (game.checkWin(game.opponentPoints) === true) {
         return 10;
     } else if (game.checkWin(game.myPoints) === true) {
         return -10;
-    } else if (game.freeSquares.length === 0) {
+    } else if (k === game.freeSquares.length) {
         return 0;
     }
 
     depth++;
     var scores = [], moves = [];
-    for(var i = 0; i < game.freeSquares.length; i++){
+    for(var i = k; i < game.freeSquares.length; i++){
         var square = game.freeSquares[i];
-        if (moves.indexOf(square) > -1){
-            console.log(moves);
-            console.log(game.freeSquares);
-            continue;
-        }
         moves.push(square);
-        //console.log(moves);
 
         if(player === 1){
-            //moves.push(square);
-            game.opponentSquares.push(square);
             game.addPoint(square, game.opponentPoints);
-            game.freeSquares.splice(i, 1);
-            scores.push(comp.makeMove(0, depth));
-            game.freeSquares.push(square);
+            comp.swap(game.freeSquares, k, i);
+            scores.push(comp.makeMove(0, depth, k + 1));
+            comp.swap(game.freeSquares, k, i);
             game.removePoint(square, game.opponentPoints);
-            game.opponentSquares.splice(game.opponentSquares.indexOf(square), 1);
         }else if (player === 0){
-            //moves.push(square);
-            game.mySquares.push(square);
             game.addPoint(square, game.myPoints);
-            game.freeSquares.splice(i, 1);
-            scores.push(comp.makeMove(1, depth));
-            game.freeSquares.push(square);
+            comp.swap(game.freeSquares, k, i);
+            scores.push(comp.makeMove(1, depth, k + 1));
+            comp.swap(game.freeSquares, k, i);
             game.removePoint(square, game.myPoints);
-            game.mySquares.splice(game.mySquares.indexOf(square), 1);
         }
     }
     if (player === 1){
@@ -69,9 +47,6 @@ comp.makeMove = function(player, depth){
         return scores[maxScoreIdx];
     } else if (player === 0) {
         var minScoreIdx = scores.indexOf(Math.min.apply(Math, scores));
-        //console.log(scores);
-        //console.log(minScoreIdx);
-        //console.log(moves);
         comp.result = moves[minScoreIdx];
         return scores[minScoreIdx];
     }
@@ -105,16 +80,14 @@ game.changeSquares = function(color, squares){
 }
 
 game.play = function(){
-    //comp.init();
-    //console.log(game.freeSquares);
-    //console.log('Mypoints ' + game.mySquares);
-    //console.log('Comps points ' + game.opponentSquares);
     comp.makeMove();
     var square = comp.result;
     console.log(square);
-    game.freeSquares.splice(game.freeSquares.indexOf(square), 1);
     game.opponentSquares.push(square);
     game.addPoint(square, game.opponentPoints);
+    game.freeSquares.splice(game.freeSquares.indexOf(square), 1);
+    game.markOpponent(square);
+    if(game.checkWin(game.opponentPoints) === true) {console.log('Comp won!!!!!');}
     var realSquare = $(game.board).get(square);
     game.forToggling.splice($(game.forToggling).index(realSquare), 1);
     $(game.forToggling).removeClass('noEvent');
@@ -124,17 +97,14 @@ game.boardSetup = function(){
     $('.square.middle').on('click', function(){
         $(this).css('background-color', game.myColor);
         var idx = game.board.index(this);
-        game.freeSquares.splice(game.freeSquares.indexOf(idx), 1);
         game.mySquares.push(idx);
         game.addPoint(idx, game.myPoints);
         $(this).addClass('noEvent');
         game.forToggling.splice($(game.forToggling).index(this), 1);
         $(game.forToggling).addClass('noEvent');
         if (game.checkWin(game.myPoints) === true) console.log('winner huhuhuuuu');
-        //comp.init();
-        //comp.makeMove();
-        //console.log(comp.result);
-        game.play();
+        game.freeSquares.splice(game.freeSquares.indexOf(idx), 1);
+        if(game.freeSquares.length > 0) game.play();
     });
     game.me.on('click', function(){
         var color = game.randomColor();
