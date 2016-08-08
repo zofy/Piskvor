@@ -9,23 +9,22 @@
     <title>TicTacToe</title>
 </head>
 <body>
-<h1>Setting up the game...</h1>
     <div class="ui three column grid">
-        <div class="column">
+        <div class="column invisible">
             <div class="square side opponent"></div>
-            <h2 class="color">His Color</h2>
+            <h2 class="color">Computer`s Color</h2>
         </div>
         <div class="column">
+        <div id="turn">
+            <h1>Who begins?</h1>
+                <span>Computer</span>
+                <span>Me</span>
+            </div>
             {% for x in range(9) %}
                 <div class="square middle"></div>
             {% end %}
-            <div id="turn">
-                <h3>Who begins?</h3>
-                <span>Comp</span>
-                <span>Me</span>
-            </div>
         </div>
-        <div class="column">
+        <div class="column invisible">
             <div class="square side me"></div>
             <h2 class="color">My Color</h2>
         </div>

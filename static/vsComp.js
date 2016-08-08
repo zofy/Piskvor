@@ -92,7 +92,7 @@ game.play = function(){
     var realSquare = $(game.board).get(square);
     game.forToggling.splice($(game.forToggling).index(realSquare), 1);
     $(game.forToggling).removeClass('noEvent');
-    $('h1').text("It`s your turn!");
+    $('#turn h1').text("It`s your turn!");
 }
 
 game.boardSetup = function(){
@@ -106,7 +106,7 @@ game.boardSetup = function(){
         $(game.forToggling).addClass('noEvent');
         if (game.checkWin(game.myPoints) === true) console.log('winner huhuhuuuu');
         game.freeSquares.splice(game.freeSquares.indexOf(idx), 1);
-        $('h1').text('Computer is on the move!');
+        $('#turn h1').text('Computer is on the move!');
         if(game.freeSquares.length > 0) game.play();
     });
     game.me.on('click', function(){
@@ -161,9 +161,10 @@ game.checkWin = function(collection){
 
 game.setUpTurn = function(){
     $('#turn span').on('click', function(){
-        if ($(this).text() === 'Me') { game.turn = 'me'; $('h1').text("It`s your turn"); }
-        else if ($(this).text() === 'Comp') { game.turn = 'comp'; $('h1').text("Comp is on the move!"); }
-        $('#turn').addClass('invisible');
+        if ($(this).text() === 'Me') { game.turn = 'me'; $('#turn').html("<h1>It`s your turn</h1>"); }
+        else if ($(this).text() === 'Computer') { game.turn = 'comp'; $('#turn').html("<h1>Comp is on the move!</h1>"); }
+        $('.column').removeClass('invisible');
+        game.init();
         game.start();
     });
 }
@@ -181,10 +182,8 @@ game.init = function(){
     game.forToggling = [];
     game.freeSquares = [0, 1, 2, 3, 4, 5, 6, 7, 8];
     game.boardSetup();
-    game.setUpTurn();
-//    game.start();
 }
 
 game.turn = null;
 
-game.init();
+game.setUpTurn();

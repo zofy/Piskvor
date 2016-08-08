@@ -3,10 +3,6 @@ body {
     color: white;
 }
 
-h1 {
-    text-align: center;
-}
-
 .square {
     background: hotpink;
     float: left;
@@ -19,7 +15,7 @@ h1 {
 }
 
 .side {
-    margin: 35% 35% auto;
+    margin: 55% 35% auto;
 }
 
 .color {
@@ -32,4 +28,15 @@ h1 {
 
 .invisible {
     visibility: hidden;
+}
+
+#turn {
+    text-align: center;
+    margin: 50px auto;
+}
+
+#turn span {
+    margin: 15px;
+    cursor: pointer;
+    cursor: hand;
 }
