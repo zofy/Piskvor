@@ -9,7 +9,7 @@
     <title>TicTacToe</title>
 </head>
 <body>
-<h1>Creating connection...</h1>
+<h1>Setting up the game...</h1>
     <div class="ui three column grid">
         <div class="column">
             <div class="square side opponent"></div>
@@ -19,12 +19,17 @@
             {% for x in range(9) %}
                 <div class="square middle"></div>
             {% end %}
+            <div id="turn">
+                <h3>Who begins?</h3>
+                <span>Comp</span>
+                <span>Me</span>
+            </div>
         </div>
         <div class="column">
             <div class="square side me"></div>
             <h2 class="color">My Color</h2>
         </div>
     </div>
-<script type="text/javascript" src="{{ static_url('game.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('vsComp.js') }}"></script>
 </body>
 </html>

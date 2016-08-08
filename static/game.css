@@ -29,3 +29,7 @@ h1 {
 .noEvent {
     pointer-events: none;
 }
+
+.invisible {
+    visibility: hidden;
+}
