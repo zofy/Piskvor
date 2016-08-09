@@ -26,20 +26,19 @@ comp.makeMove = function(player, depth, k){
     for(var i = k; i < game.freeSquares.length; i++){
         var square = game.freeSquares[i];
         moves.push(square);
+        comp.swap(game.freeSquares, k, i);
 
         if(player === 1){
             game.addPoint(square, game.opponentPoints);
-            comp.swap(game.freeSquares, k, i);
             scores.push(comp.makeMove(0, depth, k + 1));
-            comp.swap(game.freeSquares, k, i);
             game.removePoint(square, game.opponentPoints);
         }else if (player === 0){
             game.addPoint(square, game.myPoints);
-            comp.swap(game.freeSquares, k, i);
             scores.push(comp.makeMove(1, depth, k + 1));
-            comp.swap(game.freeSquares, k, i);
             game.removePoint(square, game.myPoints);
         }
+
+        comp.swap(game.freeSquares, k, i);
     }
     if (player === 1){
         var maxScoreIdx = scores.indexOf(Math.max.apply(Math, scores));
@@ -83,12 +82,11 @@ game.changeSquares = function(color, squares){
 game.play = function(){
     comp.makeMove();
     var square = comp.result;
-    console.log(square);
     game.opponentSquares.push(square);
     game.addPoint(square, game.opponentPoints);
     game.freeSquares.splice(game.freeSquares.indexOf(square), 1);
     game.markOpponent(square);
-    if(game.checkWin(game.opponentPoints) === true) {console.log('Comp won!!!!!');}
+    if(game.checkWin(game.opponentPoints) === true) { $('#turn h1').text('Computer won!'); return; }
     var realSquare = $(game.board).get(square);
     game.forToggling.splice($(game.forToggling).index(realSquare), 1);
     $(game.forToggling).removeClass('noEvent');
@@ -104,10 +102,11 @@ game.boardSetup = function(){
         $(this).addClass('noEvent');
         game.forToggling.splice($(game.forToggling).index(this), 1);
         $(game.forToggling).addClass('noEvent');
-        if (game.checkWin(game.myPoints) === true) console.log('winner huhuhuuuu');
+        if (game.checkWin(game.myPoints) === true) { $('#turn h1').text('You won!'); return; }
         game.freeSquares.splice(game.freeSquares.indexOf(idx), 1);
         $('#turn h1').text('Computer is on the move!');
-        if(game.freeSquares.length > 0) game.play();
+        if(game.freeSquares.length > 0) { game.play(); }
+        else { $('#turn h1').text('Tie!'); }
     });
     game.me.on('click', function(){
         var color = game.randomColor();
