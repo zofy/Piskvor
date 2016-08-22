@@ -88,6 +88,7 @@ game.play = function(){
     game.markOpponent(square);
     if(game.checkWin(game.opponentPoints) === true) { $('#turn h1').text('Computer won!'); return; }
     var realSquare = $(game.board).get(square);
+    $(realSquare).addClass('noEvent');
     game.forToggling.splice($(game.forToggling).index(realSquare), 1);
     $(game.forToggling).removeClass('noEvent');
     $('#turn h1').text("It`s your turn!");
